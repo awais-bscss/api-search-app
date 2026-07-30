@@ -268,6 +268,7 @@ function openProductModal(productId) {
 
   detailModal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  closeModalBtn.focus();
 }
 
 function closeProductModal() {

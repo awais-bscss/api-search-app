@@ -49,7 +49,7 @@ class StateStore {
     if (!sanitized || sanitized.length < 3) return;
 
     let updated = this.state.recentSearches.filter(
-      (item) => !sanitized.toLowerCase().startsWith(item.toLowerCase()) && item.toLowerCase() !== sanitized.toLowerCase()
+      (item) => item.toLowerCase() !== sanitized.toLowerCase()
     );
     updated.unshift(sanitized);
     updated = updated.slice(0, 5);

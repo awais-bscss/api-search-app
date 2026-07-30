@@ -14,6 +14,10 @@ export async function fetchProducts({
   const cachedData = apiCache.get(cacheKey);
 
   if (cachedData) {
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
     return {
       data: cachedData,
       isCached: true,
@@ -49,6 +53,13 @@ export async function fetchProducts({
     const rawData = await response.json();
 
     let products = Array.isArray(rawData.products) ? [...rawData.products] : [];
+    
+    if (sanitizedQuery && category && category !== 'all') {
+      products = products.filter(
+        (p) => p.category && p.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
     products = sortProducts(products, sortBy);
 
     const resultData = {
