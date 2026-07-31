@@ -1,5 +1,9 @@
 # API Search Application
 
+**Live Demo:** [Open Live App](https://awais-bscss.github.io/api-search-app/)
+
+---
+
 ## Overview
 
 A Vanilla JavaScript API Search Application built without external libraries or frameworks. Demonstrates debouncing, request cancellation via AbortController, in-memory caching with TTL, state management, pagination, and UI state rendering.
@@ -100,52 +104,54 @@ Api Search App/
 
 ## Module Responsibilities
 
-| File | Responsibility |
-| :--- | :--- |
-| `main.js` | App entry point — initializes state subscription, sets up all event listeners, orchestrates search execution and modal logic |
-| `constants.js` | Centralized configuration — API base URL, debounce delay (350ms), cache TTL (5 min), localStorage keys |
-| `api.js` | Fetch wrapper with AbortController cancellation, cache-first lookup, endpoint construction, client-side sorting |
-| `cache.js` | In-memory `Map` cache with TTL — composite key generation, expiry checking, get/set/clear operations |
-| `state.js` | Class-based state store — Observer pattern with `subscribe`/`notify`, shallow-merge `setState`, localStorage persistence for recent searches |
-| `render.js` | Barrel re-export forwarding all render functions from `render/index.js` |
-| `render/index.js` | Barrel export aggregating all individual render modules |
-| `renderLoadingState.js` | Generates skeleton placeholder cards with shimmer animation matching current page limit |
-| `renderErrorState.js` | Renders error message with a Retry button for re-executing the failed search |
-| `renderEmptyState.js` | Contextual empty state — different messages for query vs category vs general, with Clear Search action |
-| `renderProductsGrid.js` | Builds responsive product card grid with lazy images, discount badges, and View Details buttons |
-| `renderPagination.js` | Pagination nav — Previous/Next, numbered buttons, ellipsis for large page ranges, disabled state handling |
-| `renderStatusBar.js` | Displays result count range, search query highlight, category filter info, and cached response badge |
-| `renderRecentSearches.js` | Renders clickable chip tags for recent search terms with Clear History option |
-| `populateCategoriesSelect.js` | Dynamically populates the category `<select>` from API data with proper slug/name handling |
-| `debounce.js` | Generic debounce utility — delays function execution, returns wrapper with `.cancel()` method |
-| `dom.js` | `escapeHTML` function — sanitizes strings against `&`, `<`, `>`, `"`, `'` for safe innerHTML injection |
+| File                          | Responsibility                                                                                                                               |
+| :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main.js`                     | App entry point — initializes state subscription, sets up all event listeners, orchestrates search execution and modal logic                 |
+| `constants.js`                | Centralized configuration — API base URL, debounce delay (350ms), cache TTL (5 min), localStorage keys                                       |
+| `api.js`                      | Fetch wrapper with AbortController cancellation, cache-first lookup, endpoint construction, client-side sorting                              |
+| `cache.js`                    | In-memory `Map` cache with TTL — composite key generation, expiry checking, get/set/clear operations                                         |
+| `state.js`                    | Class-based state store — Observer pattern with `subscribe`/`notify`, shallow-merge `setState`, localStorage persistence for recent searches |
+| `render.js`                   | Barrel re-export forwarding all render functions from `render/index.js`                                                                      |
+| `render/index.js`             | Barrel export aggregating all individual render modules                                                                                      |
+| `renderLoadingState.js`       | Generates skeleton placeholder cards with shimmer animation matching current page limit                                                      |
+| `renderErrorState.js`         | Renders error message with a Retry button for re-executing the failed search                                                                 |
+| `renderEmptyState.js`         | Contextual empty state — different messages for query vs category vs general, with Clear Search action                                       |
+| `renderProductsGrid.js`       | Builds responsive product card grid with lazy images, discount badges, and View Details buttons                                              |
+| `renderPagination.js`         | Pagination nav — Previous/Next, numbered buttons, ellipsis for large page ranges, disabled state handling                                    |
+| `renderStatusBar.js`          | Displays result count range, search query highlight, category filter info, and cached response badge                                         |
+| `renderRecentSearches.js`     | Renders clickable chip tags for recent search terms with Clear History option                                                                |
+| `populateCategoriesSelect.js` | Dynamically populates the category `<select>` from API data with proper slug/name handling                                                   |
+| `debounce.js`                 | Generic debounce utility — delays function execution, returns wrapper with `.cancel()` method                                                |
+| `dom.js`                      | `escapeHTML` function — sanitizes strings against `&`, `<`, `>`, `"`, `'` for safe innerHTML injection                                       |
 
 ---
 
 ## Technical Decisions
 
-| Decision | Rationale |
-| :--- | :--- |
-| **Class-based StateStore** | Encapsulates state, listeners, and localStorage logic in a single cohesive unit. The Observer pattern allows `main.js` to react to state changes without tight coupling to individual modules. |
-| **`Map` for caching** | `Map` preserves insertion order and accepts any key type. Combined with a composite string key (`q:...\|cat:...\|p:...\|sort:...`), it ensures unique cache entries per search parameter combination. |
-| **Cache-first in `api.js`** | Checking cache before creating an `AbortController` avoids unnecessary abort calls and skips the network entirely for repeated searches within the TTL window. |
-| **Abort before fetch** | Each `fetchProducts` call aborts any previous in-flight request first. This guarantees only the latest request resolves, preventing race conditions when the user types fast or switches pages rapidly. |
-| **Render module split** | Splitting render functions into individual files keeps each under 50 lines. The barrel export (`render/index.js`) provides a single clean import path while maintaining separation of concerns. |
-| **Client-side sorting** | DummyJSON's `/search` endpoint does not support server-side sort parameters. Sorting is applied to the fetched result set before caching, so cached responses retain the correct sort order. |
-| **`escapeHTML` utility** | All `innerHTML` assignments pass through `escapeHTML` to neutralize any HTML/JS in API response fields, preventing stored XSS from malicious product data. |
-| **Event delegation** | Pagination clicks, retry button, clear filters, and product detail buttons are all handled via event delegation on parent containers. This avoids attaching/removing listeners on every re-render. |
+| Decision                    | Rationale                                                                                                                                                                                               |
+| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Class-based StateStore**  | Encapsulates state, listeners, and localStorage logic in a single cohesive unit. The Observer pattern allows `main.js` to react to state changes without tight coupling to individual modules.          |
+| **`Map` for caching**       | `Map` preserves insertion order and accepts any key type. Combined with a composite string key (`q:...\|cat:...\|p:...\|sort:...`), it ensures unique cache entries per search parameter combination.   |
+| **Cache-first in `api.js`** | Checking cache before creating an `AbortController` avoids unnecessary abort calls and skips the network entirely for repeated searches within the TTL window.                                          |
+| **Abort before fetch**      | Each `fetchProducts` call aborts any previous in-flight request first. This guarantees only the latest request resolves, preventing race conditions when the user types fast or switches pages rapidly. |
+| **Render module split**     | Splitting render functions into individual files keeps each under 50 lines. The barrel export (`render/index.js`) provides a single clean import path while maintaining separation of concerns.         |
+| **Client-side sorting**     | DummyJSON's `/search` endpoint does not support server-side sort parameters. Sorting is applied to the fetched result set before caching, so cached responses retain the correct sort order.            |
+| **`escapeHTML` utility**    | All `innerHTML` assignments pass through `escapeHTML` to neutralize any HTML/JS in API response fields, preventing stored XSS from malicious product data.                                              |
+| **Event delegation**        | Pagination clicks, retry button, clear filters, and product detail buttons are all handled via event delegation on parent containers. This avoids attaching/removing listeners on every re-render.      |
 
 ---
 
 ## Setup & Running Locally
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/<your-username>/api-search-app.git
    cd api-search-app
    ```
 
 2. Open `index.html` directly in a browser, or use a local server:
+
    ```bash
    npx serve .
    ```
