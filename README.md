@@ -146,7 +146,7 @@ Api Search App/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/<your-username>/api-search-app.git
+   git clone https://github.com/awais-bscss/api-search-app.git
    cd api-search-app
    ```
 
