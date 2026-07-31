@@ -79,6 +79,8 @@ async function executeSearch() {
   const currentState = store.getState();
   store.setState({ status: 'loading', errorMessage: null });
 
+  const startTime = Date.now();
+
   const result = await fetchProducts({
     query: currentState.query,
     category: currentState.category,
@@ -89,6 +91,12 @@ async function executeSearch() {
 
   if (result.aborted) {
     return;
+  }
+
+  // Ensure minimum 300ms smooth skeleton display to prevent flickering
+  const elapsedTime = Date.now() - startTime;
+  if (elapsedTime < 300) {
+    await new Promise((resolve) => setTimeout(resolve, 300 - elapsedTime));
   }
 
   if (result.error) {
