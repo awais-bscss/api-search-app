@@ -29,13 +29,14 @@ const detailModal = document.getElementById('detail-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const modalContent = document.getElementById('modal-content');
 
-async function initApp() {
-  const categories = await fetchCategories();
-  populateCategoriesSelect(categorySelect, categories, store.getState().category);
-
+function initApp() {
   store.subscribe(handleStateChange);
   setupEventListeners();
   executeSearch();
+
+  fetchCategories().then((categories) => {
+    populateCategoriesSelect(categorySelect, categories, store.getState().category);
+  });
 }
 
 function handleStateChange(state) {
